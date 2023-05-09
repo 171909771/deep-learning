@@ -1,0 +1,33 @@
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import matplotlib.pyplot as plt
+
+def lr_find(model, dataloader, loss_fn, optimizer, start_lr=1e-7, end_lr=1, num_iter=10):
+    model.train()
+    losses = []
+    losses_to =[]
+    learning_rates = torch.logspace(start=torch.log10(tensor(start_lr)), end=torch.log10(tensor(end_lr)), steps=num_iter)  ## 可以查看pytorch文档
+    
+    for lr in learning_rates:
+        optimizer.param_groups[0]['lr'] = lr
+
+        for inputs, targets in dataloader:
+            optimizer.zero_grad()
+            inputs = inputs.to(device)
+            targets = targets.to(device)
+            outputs = model(inputs)
+            loss = loss_fn(outputs, targets)
+            loss.backward()
+            optimizer.step()
+
+            losses.append(loss.item())
+        losses_to.append(sum(losses)/len(losses))
+    
+    print(f"learning_rates:{learning_rates}")
+    print(f"losses_to:{losses_to}")
+    plt.plot(learning_rates, losses_to)
+    plt.xlabel('Learning Rate')
+    plt.ylabel('Loss')
+    plt.xscale('log')
+    plt.show()
