@@ -20,6 +20,6 @@ def softmax(x): return exp(x) / exp(x).sum(dim=1, keepdim=True)
 ###### 2. negative log
 ![image](https://github.com/171909771/deep-learning/assets/41554601/c1fe4eb7-3fc3-4dee-8e2e-5a840349a51a)
 
-####### loss: log(-(result))
+- loss: log(-(result))
 
 ![image](https://github.com/171909771/deep-learning/assets/41554601/86a7b943-9bbd-46f3-87c5-f62befe06bbc)
