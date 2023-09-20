@@ -34,7 +34,8 @@ with torch.no_grad():    ## 计算梯度，预测时必须加入，不然内存�
     output = net(img).cpu()  # torch.Size([1, 2, 1280, 1918])
     output = F.interpolate(output, (full_img.size[1], full_img.size[0]), mode='bilinear')   ## 似乎可以不要，待研究！！！！
     mask = output.argmax(dim=1)  # torch.Size([1, 1280, 1918])
-mask=mask[0].long().squeeze().numpy()   ## 似乎可以简化为 mask=mask[0].numpy()  ，待研究！！！！
+mask=mask[0].long().squeeze().numpy()  # (1280, 1918)
+# 似乎可以简化为 mask=mask[0].numpy()  ，待研究！！！！
 ```
 ### 3. 制造一个与mask大小一致的False矩阵  (1280, 1918)
 ```
