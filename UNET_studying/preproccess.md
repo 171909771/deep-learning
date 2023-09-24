@@ -17,26 +17,22 @@ from tqdm import tqdm
 ```
 
 ## 主程序
-#### 1.读取文件目录
+### 1.读取文件目录
 ```
 images_dir = Path('./data/imgs/train/')
 mask_dir = Path('./data/masks/train_masks/')
 images_dir = Path(images_dir)
 mask_dir = Path(mask_dir)
 ```
-#### 2.读取文件目录下的文件名（不要后缀名）
-- splitext：以"."将str划分
-- listdir：读取读取文件目录下的文件名
-- file.startswith('.')：不要以"."开头的文件，文件夹里面有一个".keep"文件，这个不要
+### 2.读取文件目录下的文件名（不要后缀名）
 ```
 ids = [splitext(file)[0] for file in listdir(images_dir) if isfile(join(images_dir, file)) and not file.startswith('.')]
 ```
-#### 3.判断mask是否
-###### 3.1. 读取mask图像，并且转换为数值，最后将数值唯一化(e.g., 图片是由大量的0，1组成，最后得到0，1)
-- 分割图层文件名为 "00087a6bd4dc_01_mask.gif"
-- .glob: 查找附后后面条件的文件
-- idx：代表去除后缀名和原始图像相同的文件名
-- 由于mask_dir.glob为内存地址，需要用list来提取内容，再用[0]来提取list中的内容
+- splitext：以"."将str划分
+- listdir：读取读取文件目录下的文件名
+- file.startswith('.')：不要以"."开头的文件，文件夹里面有一个".keep"文件，这个不要
+### 3.遍历所有mask文件看是否都是0,1值
+#### 3.1. 读取mask图像，并且转换为数值，最后将数值唯一化(e.g., 图片是由大量的0，1组成，最后得到0，1)
 ```
 def unique_mask_values(idx, mask_dir, mask_suffix):
     mask_file = list(mask_dir.glob(idx + mask_suffix + '.*'))[0]   # 提取mask文件名
@@ -49,16 +45,13 @@ def unique_mask_values(idx, mask_dir, mask_suffix):
     else:
         raise ValueError(f'Loaded masks should have 2 or 3 dimensions, found {mask.ndim}')
 ```
-###### 3.2. 
-- P.imap：并行处理迭代like
-```
-unique = []
-for n in tqdm(ids,total=len(ids)):
-    result = partial(unique_mask_values, mask_dir=mask_dir, mask_suffix=mask_suffix)(n)
-    unique.append(result)
-```
-- ; P.map是全部计算完成后给出最终list结果（浪费内存），而不是每次迭代都给出结果，不要用
-- partial：给unique_mask_values的mask_dir和mask_suffix赋予了默认值。
+##### 注释
+- 分割图层文件名为 "00087a6bd4dc_01_mask.gif"
+- .glob: 查找附后后面条件的文件
+- idx：代表去除后缀名和原始图像相同的文件名
+- 由于mask_dir.glob为内存地址，需要用list来提取内容，再用[0]来提取list中的内容
+#### 3.2. 遍历所有mask文件
+- 注意tqdm的用法
 ```
 with Pool() as p:
             unique = list(tqdm(
@@ -66,7 +59,16 @@ with Pool() as p:
                 total=len(ids)
             ))
 ```
-
+##### 注释
+- P.imap：并行处理迭代like
+```
+unique = []
+for n in tqdm(ids,total=len(ids),desc="Processing"):
+    result = partial(unique_mask_values, mask_dir=mask_dir, mask_suffix=mask_suffix)(n),
+    unique.append(result)
+```
+- P.imap vs P.map: 前者是每次迭代都给出结果，后者全部计算完成后给出最终结果（浪费内存，不要用）
+- partial：给unique_mask_values的mask_dir和mask_suffix赋予了默认值。
 
 
 
