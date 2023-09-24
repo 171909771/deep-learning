@@ -59,7 +59,7 @@ with Pool() as p:
                 total=len(ids)
             ))
 ```
-***注释***
+*注释*
 - P.imap：并行处理迭代like
 ```
 unique = []
