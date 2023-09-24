@@ -61,8 +61,8 @@ with Pool() as p:
 ```
 ***
 ***注释***
-- 注意tqdm的用法
-- P.imap：并行处理迭代like
+1. 注意tqdm的用法
+2. P.imap：并行处理迭代like
 ```
 unique = []
 for n in tqdm(ids,total=len(ids),desc="Processing"):
@@ -70,17 +70,7 @@ for n in tqdm(ids,total=len(ids),desc="Processing"):
     unique.append(result)
 ```
 - P.imap vs P.map: 前者是每次迭代都给出结果，后者全部计算完成后给出最终结果（浪费内存，不要用）
-- partial：给unique_mask_values的mask_dir和mask_suffix赋予了默认值。
+3. partial：给unique_mask_values的mask_dir和mask_suffix赋予了默认值。
 
 
 
-
-
-
-
-
-with Pool() as p:
-            unique = list(tqdm(
-                p.imap(partial(unique_mask_values, mask_dir=mask_dir, mask_suffix=mask_suffix), ids),
-                total=len(ids)
-            ))
