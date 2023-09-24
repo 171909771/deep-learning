@@ -1,25 +1,26 @@
-### yes or no classification and sigmoid, gradients and optimizer
+## 1. yes or no classification and sigmoid, gradients and optimizer
 - https://nbviewer.org/github/fastai/fastbook/blob/master/04_mnist_basics.ipynb
-###### loss.backward: calculate gradients
+#### loss.backward: calculate gradients
 ![image](https://github.com/171909771/deep-learning/assets/41554601/c9dff38e-eb6a-4391-bf63-845f39c5fcf9)
 ```
 def mnist_loss(predictions, targets):
     return torch.where(targets==1, 1-predictions, predictions).mean()
 ```
-- output只有一个value（x），传入sigmoid函数得到0-1之间的一个值来预测yes的概率，yes的loss就是1-这个概率，no的loss即使这个概率
+-每一个项目的预测output只有一个value（x），传入sigmoid函数将值缩放到0-1（yes的概率），target为yes（loss=1-yes的概率），target为no（loss=yes的概率）
 
-### multiple classification and softmax + negative log likelihood = crossentropy
+## 2. multiple classification and softmax + negative log likelihood = crossentropy
 - https://nbviewer.org/github/fastai/fastbook/blob/master/05_pet_breeds.ipynb
 ![image](https://github.com/171909771/deep-learning/assets/41554601/bb9a2bd7-8aae-4746-acf0-3029525822e2)
 
-###### 1. softmax
+#### 2.1. softmax
 ```
 def softmax(x): return exp(x) / exp(x).sum(dim=1, keepdim=True)
 ```
+- 每一个项目的预测output有n个value（n=分类数），将这些value传入softmax得到该项目每个分类的概率（总和为1）
 
-###### 2. negative log
+#### 2.2. negative log
 ![image](https://github.com/171909771/deep-learning/assets/41554601/c1fe4eb7-3fc3-4dee-8e2e-5a840349a51a)
 
-- loss: log(-(result))
-
 ![image](https://github.com/171909771/deep-learning/assets/41554601/86a7b943-9bbd-46f3-87c5-f62befe06bbc)
+
+- 
