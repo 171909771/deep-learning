@@ -6,7 +6,7 @@
 def mnist_loss(predictions, targets):
     return torch.where(targets==1, 1-predictions, predictions).mean()
 ```
-
+- output只有一个value（x），传入sigmoid函数得到0-1之间的一个值来预测yes的概率，yes的loss就是1-这个概率，no的loss即使这个概率
 
 ### multiple classification and softmax + negative log likelihood = crossentropy
 - https://nbviewer.org/github/fastai/fastbook/blob/master/05_pet_breeds.ipynb
