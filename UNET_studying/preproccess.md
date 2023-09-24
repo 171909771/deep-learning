@@ -28,6 +28,7 @@ ids = [splitext(file)[0] for file in listdir(images_dir) if isfile(join(images_d
 - splitext：以"."将str划分
 - listdir：读取读取文件目录下的文件名
 - file.startswith('.')：不要以"."开头的文件，文件夹里面有一个".keep"文件，这个不要
+
 ### 2.遍历所有mask文件看是否都是0,1值
 #### 2.1. 读取mask图像，并且转换为数值，最后将数值唯一化(e.g., 图片是由大量的0，1组成，最后得到0，1)
 ```
