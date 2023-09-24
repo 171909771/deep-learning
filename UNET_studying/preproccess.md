@@ -45,12 +45,12 @@ def unique_mask_values(idx, mask_dir, mask_suffix):
     else:
         raise ValueError(f'Loaded masks should have 2 or 3 dimensions, found {mask.ndim}')
 ```
-##### 注释
+###### 注释
 - 分割图层文件名为 "00087a6bd4dc_01_mask.gif"
 - .glob: 查找附后后面条件的文件
 - idx：代表去除后缀名和原始图像相同的文件名
 - 由于mask_dir.glob为内存地址，需要用list来提取内容，再用[0]来提取list中的内容
-#### 3.2. 遍历所有mask文件
+#### 3.2. 用unique_mask_values遍历所有mask文件
 - 注意tqdm的用法
 ```
 with Pool() as p:
@@ -59,7 +59,7 @@ with Pool() as p:
                 total=len(ids)
             ))
 ```
-##### 注释
+###### 注释
 - P.imap：并行处理迭代like
 ```
 unique = []
