@@ -155,7 +155,7 @@ for epoch in range(1, epochs + 1):
 ***注释***
 - model.train() vs model.eval(): 是否启用 Batch Normalization 和 Dropout. https://blog.csdn.net/weixin_44211968/article/details/123774649
 - assert： 条件性警告，如果条件为假，则报错后面内容
-- 1. grad_scaler and autocast: 用混合精度来提升运算速度 https://zhuanlan.zhihu.com/p/165152789
+-1.grad_scaler and autocast: 用混合精度来提升运算速度 https://zhuanlan.zhihu.com/p/165152789
 
 
 
