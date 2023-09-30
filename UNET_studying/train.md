@@ -145,7 +145,7 @@ for epoch in range(1, epochs + 1):
                         if not (torch.isinf(value.grad) | torch.isnan(value.grad)).any():
                             histograms['Gradients/' + tag] = wandb.Histogram(value.grad.data.cpu())
 
-                    val_score = evaluate(model, val_loader, device, amp)
+                    val_score = evaluate(model, val_loader, device, amp)  # 评估参考 
                     scheduler.step(val_score)
 
                     logging.info('Validation Dice score: {}'.format(val_score))
@@ -191,21 +191,3 @@ for epoch in range(1, epochs + 1):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-## dice_loss
-- https://blog.csdn.net/qq_54000767/article/details/129905320
-
-##  grad_scaler and autocast
-- https://zhuanlan.zhihu.com/p/165152789
-- 用混合精度来提升运算速度
