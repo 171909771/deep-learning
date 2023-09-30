@@ -69,7 +69,7 @@ global_step = 0
 ## 5. Begin training
 ```
 for epoch in range(1, epochs + 1):
-    model.train()  # 注释
+    model.train()  # 注释2
     epoch_loss = 0
     with tqdm(total=n_train, desc=f'Epoch {epoch}/{epochs}', unit='img') as pbar:  # tqdm后缀set_postfix的用法
         for batch in train_loader:
@@ -78,29 +78,29 @@ for epoch in range(1, epochs + 1):
             assert images.shape[1] == model.n_channels, \
                 f'Network has been defined with {model.n_channels} input channels, ' \
                 f'but loaded images have {images.shape[1]} channels. Please check that ' \
-                'the images are loaded correctly.' # 注释
+                'the images are loaded correctly.' # 注释3
 
             images = images.to(device=device, dtype=torch.float32, memory_format=torch.channels_last)
             true_masks = true_masks.to(device=device, dtype=torch.long)
 
-            with torch.autocast(device.type if device.type != 'mps' else 'cpu', enabled=amp):
+            with torch.autocast(device.type if device.type != 'mps' else 'cpu', enabled=amp): # 注释1
                 masks_pred = model(images)
                 if model.n_classes == 1:
                     loss = criterion(masks_pred.squeeze(1), true_masks.float())
                     loss += dice_loss(F.sigmoid(masks_pred.squeeze(1)), true_masks.float(), multiclass=False)
                 else:
                     loss = criterion(masks_pred, true_masks)
-                    loss += dice_loss(
+                    loss += dice_loss(   # 注释4
                         F.softmax(masks_pred, dim=1).float(),
                         F.one_hot(true_masks, model.n_classes).permute(0, 3, 1, 2).float(),
                         multiclass=True
                     )
 
             optimizer.zero_grad(set_to_none=True)
-            grad_scaler.scale(loss).backward()
+            grad_scaler.scale(loss).backward()  # 注释1
             torch.nn.utils.clip_grad_norm_(model.parameters(), gradient_clipping)
-            grad_scaler.step(optimizer)
-            grad_scaler.update()
+            grad_scaler.step(optimizer)  # 注释1
+            grad_scaler.update()  # 注释1
 
             pbar.update(images.shape[0]) # tqdm 参数更新
             global_step += 1
@@ -110,7 +110,7 @@ for epoch in range(1, epochs + 1):
                 'step': global_step,
                 'epoch': epoch
             })
-            pbar.set_postfix(**{'loss (batch)': loss.item()})
+            pbar.set_postfix(**{'loss (batch)': loss.item()}) # tqdm 添加后缀参数
 
             # Evaluation round
             division_step = (n_train // (5 * batch_size))
@@ -153,10 +153,10 @@ for epoch in range(1, epochs + 1):
 ```
 ***
 ***注释***
-- model.train() vs model.eval(): 是否启用 Batch Normalization 和 Dropout. https://blog.csdn.net/weixin_44211968/article/details/123774649
-- assert： 条件性警告，如果条件为假，则报错后面内容
 1. grad_scaler and autocast: 用混合精度来提升运算速度 https://zhuanlan.zhihu.com/p/165152789
-
+2. model.train() vs model.eval(): 是否启用 Batch Normalization 和 Dropout. https://blog.csdn.net/weixin_44211968/article/details/123774649
+3. assert： 条件性警告，如果条件为假，则报错后面内容
+4. dice_loss: 比较两个tensor的相似性 https://blog.csdn.net/qq_54000767/article/details/129905320
 
 
 
