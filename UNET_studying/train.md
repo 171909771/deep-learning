@@ -68,7 +68,9 @@ global_step = 0
 
 ## (Initialize logging) 需要研究下面的用法
 ```
+# 注释1
 experiment = wandb.init(project='U-Net', resume='allow', anonymous='must')
+# 注释2
 experiment.config.update(
     dict(epochs=epochs, batch_size=batch_size, learning_rate=learning_rate,
          val_percent=val_percent, save_checkpoint=save_checkpoint, img_scale=img_scale, amp=amp)
@@ -86,6 +88,12 @@ logging.info(f'''Starting training:
     Mixed Precision: {amp}
 ''')
 ```
+***
+***注释***
+1. wandb初始化（以匿名的方式进行，可以不用登录自己的账号），注释信息中提供的网址就可以进去可视化
+2. 对该项目的具体参数进行记录，如下
+![image](https://github.com/171909771/deep-learning/assets/41554601/e48503ab-712d-4ad4-b631-f9f43dfaa3c3)
+
 
 ## 5. Begin training
 ```
@@ -126,6 +134,7 @@ for epoch in range(1, epochs + 1):
             pbar.update(images.shape[0]) # tqdm 参数更新
             global_step += 1
             epoch_loss += loss.item()
+            # 注释5
             experiment.log({
                 'train loss': loss.item(),
                 'step': global_step,
@@ -178,7 +187,7 @@ for epoch in range(1, epochs + 1):
 2. model.train() vs model.eval(): 是否启用 Batch Normalization 和 Dropout. https://blog.csdn.net/weixin_44211968/article/details/123774649
 3. assert： 条件性警告，如果条件为假，则报错后面内容
 4. dice_loss: 比较两个tensor的相似性 https://blog.csdn.net/qq_54000767/article/details/129905320
-
+5. 接前面的wandb，这里记录的参数就可以在网页中可视化
 
 
 
