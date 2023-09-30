@@ -66,6 +66,27 @@ global_step = 0
 ***注释***
 - grad_scaler：用混合精度来提升运算速度  https://zhuanlan.zhihu.com/p/165152789
 
+## (Initialize logging) 需要研究下面的用法
+```
+experiment = wandb.init(project='U-Net', resume='allow', anonymous='must')
+experiment.config.update(
+    dict(epochs=epochs, batch_size=batch_size, learning_rate=learning_rate,
+         val_percent=val_percent, save_checkpoint=save_checkpoint, img_scale=img_scale, amp=amp)
+)
+
+logging.info(f'''Starting training:
+    Epochs:          {epochs}
+    Batch size:      {batch_size}
+    Learning rate:   {learning_rate}
+    Training size:   {n_train}
+    Validation size: {n_val}
+    Checkpoints:     {save_checkpoint}
+    Device:          {device.type}
+    Images scaling:  {img_scale}
+    Mixed Precision: {amp}
+''')
+```
+
 ## 5. Begin training
 ```
 for epoch in range(1, epochs + 1):
