@@ -64,8 +64,7 @@ global_step = 0
 ```
 ***
 ***注释***
-grad_scaler：用混合精度来提升运算速度
-- https://zhuanlan.zhihu.com/p/165152789
+- grad_scaler：用混合精度来提升运算速度  https://zhuanlan.zhihu.com/p/165152789
 
 ## 5. Begin training
 ```
@@ -154,8 +153,7 @@ for epoch in range(1, epochs + 1):
 ```
 ***
 ***注释***
-.train() vs .eval(): 
-https://blog.csdn.net/weixin_44211968/article/details/123774649
+- model.train() vs model.eval(): 是否启用 Batch Normalization 和 Dropout. https://blog.csdn.net/weixin_44211968/article/details/123774649
 
 
 
