@@ -167,9 +167,9 @@ for epoch in range(1, epochs + 1):
 
     if save_checkpoint:
         Path(dir_checkpoint).mkdir(parents=True, exist_ok=True)
-        state_dict = model.state_dict()
+        state_dict = model.state_dict()  # 提取model中的参数具体值
         state_dict['mask_values'] = dataset.mask_values
-        torch.save(state_dict, str(dir_checkpoint / 'checkpoint_epoch{}.pth'.format(epoch)))
+        torch.save(state_dict, str(dir_checkpoint / 'checkpoint_epoch{}.pth'.format(epoch)))  # 参数保存
         logging.info(f'Checkpoint {epoch} saved!')
 ```
 ***
