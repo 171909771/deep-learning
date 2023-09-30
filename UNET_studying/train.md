@@ -69,16 +69,16 @@ global_step = 0
 ## 5. Begin training
 ```
 for epoch in range(1, epochs + 1):
-    model.train()
+    model.train()  # 注释
     epoch_loss = 0
-    with tqdm(total=n_train, desc=f'Epoch {epoch}/{epochs}', unit='img') as pbar:
+    with tqdm(total=n_train, desc=f'Epoch {epoch}/{epochs}', unit='img') as pbar:  # tqdm后缀set_postfix的用法
         for batch in train_loader:
             images, true_masks = batch['image'], batch['mask']
 
             assert images.shape[1] == model.n_channels, \
                 f'Network has been defined with {model.n_channels} input channels, ' \
                 f'but loaded images have {images.shape[1]} channels. Please check that ' \
-                'the images are loaded correctly.'
+                'the images are loaded correctly.' # 注释
 
             images = images.to(device=device, dtype=torch.float32, memory_format=torch.channels_last)
             true_masks = true_masks.to(device=device, dtype=torch.long)
@@ -102,7 +102,7 @@ for epoch in range(1, epochs + 1):
             grad_scaler.step(optimizer)
             grad_scaler.update()
 
-            pbar.update(images.shape[0])
+            pbar.update(images.shape[0]) # tqdm 参数更新
             global_step += 1
             epoch_loss += loss.item()
             experiment.log({
@@ -154,7 +154,7 @@ for epoch in range(1, epochs + 1):
 ***
 ***注释***
 - model.train() vs model.eval(): 是否启用 Batch Normalization 和 Dropout. https://blog.csdn.net/weixin_44211968/article/details/123774649
-
+- assert： 条件性警告，如果条件为假，则报错后面内容
 
 
 
