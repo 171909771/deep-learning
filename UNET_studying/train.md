@@ -66,7 +66,7 @@ global_step = 0
 ***注释***
 - grad_scaler：用混合精度来提升运算速度  https://zhuanlan.zhihu.com/p/165152789
 
-## (Initialize logging) 需要研究下面的用法
+## (Initialize logging) 
 ```
 # 注释1
 experiment = wandb.init(project='U-Net', resume='allow', anonymous='must')
@@ -75,7 +75,7 @@ experiment.config.update(
     dict(epochs=epochs, batch_size=batch_size, learning_rate=learning_rate,
          val_percent=val_percent, save_checkpoint=save_checkpoint, img_scale=img_scale, amp=amp)
 )
-
+# kaggle中不能用，未找到解决办法
 logging.info(f'''Starting training:
     Epochs:          {epochs}
     Batch size:      {batch_size}
