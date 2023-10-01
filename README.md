@@ -24,3 +24,8 @@ def softmax(x): return exp(x) / exp(x).sum(dim=1, keepdim=True)
 ![image](https://github.com/171909771/deep-learning/assets/41554601/86a7b943-9bbd-46f3-87c5-f62befe06bbc)
 
 - 用-log（result）来进一步扩大target差预测的值
+
+
+***体会***
+kernel的大小（e.g., kernal_size = 3 is 3*3）会使图片的大小  *x * y* 变为 *x-(3-1) * y-(3-1)*
+padding的大小（e.g., padding = 1) 会使图片的大小  *x * y* 变为 *x+(1+1) * y+(1+1)*
