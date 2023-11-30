@@ -1,3 +1,9 @@
+1. 图像操作，打入标签
+![example](https://github.com/171909771/deep-learning/assets/41554601/606c355d-f754-41ee-adba-bee93176ed12)
+
+
+2. 编程出tiles
+```
 import qupath.lib.images.servers.LabeledImageServer
 
 def imageData = getCurrentImageData()
@@ -33,3 +39,4 @@ new TileExporter(imageData)
     .writeTiles(pathOutput)     // Write tiles to the specified directory  名称似乎改不了
 
 print 'Done!'
+```
