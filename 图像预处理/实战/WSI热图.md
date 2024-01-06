@@ -39,6 +39,7 @@ df.to_csv(new_file_path_v3, index=False)
 
 ### 1. Qupath中运行
 ### 2. 选取之前得到的newresults.csv
+- https://gist.github.com/juliangilbey/49a84e0b0cfe5aeffbd9e1128cfa8d07#file-drawpredictionobjects-groovy
 ```
 /* Read a CSV file containing detection objects and measurement values for them in the range 0 to 1 */
 
