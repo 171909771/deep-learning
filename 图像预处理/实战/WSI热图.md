@@ -1,6 +1,7 @@
 
 ## Step1. 预处理推断结果
 ### 1. 合并model/viz中的train和val文件
+##### 如果是what批量inference出的结果，那么就跳过这一步。
 ```
 # Function to read file content
 def read_file(file_path):
