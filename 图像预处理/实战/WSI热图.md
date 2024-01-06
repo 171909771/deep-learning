@@ -1,44 +1,5 @@
-### 将推断出的.csv转换成qupath能读取的格式
-```
-import pandas as pd
 
-# Load the CSV file
-file_path = '/home/chan87/jupyter_home/results.csv'
-df = pd.read_csv(file_path)
-
-# Define a function to extract information from the filename
-def extract_info_from_filename_v3(filename):
-    try:
-        parts = filename.split('_')
-        x_index = parts.index('x') + 1
-        y_index = parts.index('y') + 1
-        w_index = parts.index('w') + 1
-        h_index = parts.index('h') + 1
-        x = int(parts[x_index])
-        y = int(parts[y_index])
-        width = int(parts[w_index])
-        height = int(parts[h_index].split('.')[0])
-        return x, y, width, height
-    except (ValueError, IndexError):
-        return None, None, None, None
-
-# Apply the extraction function to the first column
-df[['x', 'y', 'width', 'height']] = df.iloc[:, 0].apply(lambda x: pd.Series(extract_info_from_filename_v3(x)))
-
-# Remove rows with None values (if any)
-df = df.dropna()
-
-# Reorder and rename columns as needed
-df = df[['x', 'y', 'width', 'height', df.columns[1]]]
-df.columns = ['x', 'y', 'width', 'height', 'VALUENAME1']
-
-# Save the new CSV file
-new_file_path_v3 = '/home/chan87/jupyter_home/newresults.csv'
-df.to_csv(new_file_path_v3, index=False)
-```
-
-
-## 预处理推断结果
+## Step1. 预处理推断结果
 ### 1. 合并model/viz中的train和val文件
 ```
 # Function to read file content
@@ -122,7 +83,7 @@ output_csv_file_path = '/home/chan87/jupyter_home/processed_data.csv'
 df.to_csv(output_csv_file_path, index=False)
 ```
 
-## Qupath中运行
+## Step2. Qupath中运行
 ### 选取之前得到的newresults.csv
 - https://gist.github.com/juliangilbey/49a84e0b0cfe5aeffbd9e1128cfa8d07#file-drawpredictionobjects-groovy
 ```
