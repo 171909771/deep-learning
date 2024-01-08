@@ -28,6 +28,7 @@ with open(merged_file_path, 'w') as file:
 
 ### 2. 提取Qupath中需要的数据，并且整理为其能够读取的格式
 ![image](https://github.com/171909771/deep-learning/assets/41554601/b0d7ca2e-9c13-49c2-98e8-6f328ebd5727)
+#### 2.1 以下是提取预测值的表格
 ```
 import pandas as pd
 import re
@@ -83,6 +84,69 @@ output_csv_file_path = '/home/chan87/jupyter_home/processed_data.csv'
 # Save the DataFrame as a CSV file
 df.to_csv(output_csv_file_path, index=False)
 ```
+
+#### 2.2 以下是提取预测概率的表格
+```
+import pandas as pd
+import re
+
+# Function to determine the delimiter in a line
+def detect_delimiter(line):
+    if '\t' in line:
+        return '\t'
+    else:
+        return r',(?![^{]*})'  # Regex for comma outside curly braces
+
+# Function to process a line and extract data
+def process_line(line, delimiter):
+    columns = re.split(delimiter, line.strip())
+
+    # Ensure there are enough columns
+    if len(columns) < 3:
+        return None
+
+    first_column, second_colunm, third_column = columns[0], float(columns[1]), int(columns[2])
+    if third_column == 0:
+        third_column = 1 - second_colunm
+    else:
+        third_column = second_colunm
+    # Extract x, y, width, height from the first column
+    match = re.search(r'_x_(\d+)_y_(\d+)_w_(\d+)_h_(\d+).jpg', first_column)
+    if match:
+        x, y, width, height = match.groups()
+        return [x, y, width, height, third_column]
+    return None
+
+# Path to the uploaded file
+file_path = '/home/chan87/jupyter_home/merged_results.txt'
+
+# Read and process the file
+data = []
+with open(file_path, 'r') as file:
+    # Read the first line to detect the delimiter
+    first_line = file.readline()
+    delimiter = detect_delimiter(first_line)
+    processed_data = process_line(first_line, delimiter)
+    if processed_data:
+        data.append(processed_data)
+    
+    # Process the rest of the lines with the detected delimiter
+    for line in file:
+        processed_data = process_line(line, delimiter)
+        if processed_data:
+            data.append(processed_data)
+
+# Creating a DataFrame
+df = pd.DataFrame(data, columns=['x', 'y', 'width', 'height', 'VALUENAME1'])
+
+# Define the path where the CSV file will be saved
+output_csv_file_path = '/home/chan87/jupyter_home/processed_data.csv'
+
+# Save the DataFrame as a CSV file
+df.to_csv(output_csv_file_path, index=False)
+```
+
+
 
 ## Step2. Qupath中运行
 ### 1. 分类热图
@@ -203,7 +267,7 @@ try (BufferedReader br = new BufferedReader(new FileReader(csvfile))) {
 }
 ```
 
-### 2.1 概率热图 (修改上面的代码)
+### 3.1 概率热图 (修改上面的代码)
 ### 选取之前得到的probability.csv
 ```
 /* Read a CSV file containing detection objects and measurement values for them in the range 0 to 1 */
@@ -343,7 +407,7 @@ try (BufferedReader br = new BufferedReader(new FileReader(csvfile))) {
 ```
 
 
-### 2.2 概率热图 (生成annotation object)，耗时
+### 3.2 概率热图 (生成annotation object)，耗时
 ```
 import qupath.lib.objects.PathAnnotationObject
 import qupath.lib.roi.RectangleROI
