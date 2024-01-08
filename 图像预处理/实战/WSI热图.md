@@ -203,7 +203,7 @@ try (BufferedReader br = new BufferedReader(new FileReader(csvfile))) {
 }
 ```
 
-### 2. 概率热图
+### 2.1 概率热图 (修改上面的代码)
 ### 选取之前得到的probability.csv
 ```
 /* Read a CSV file containing detection objects and measurement values for them in the range 0 to 1 */
@@ -340,4 +340,67 @@ try (BufferedReader br = new BufferedReader(new FileReader(csvfile))) {
 } catch (IOException ex) {
     Dialogs.showErrorMessage("File open error", ex.getMessage())
 }
+```
+
+
+### 2.2 概率热图 (生成annotation object)，耗时
+```
+import qupath.lib.objects.PathAnnotationObject
+import qupath.lib.roi.RectangleROI
+import qupath.lib.scripting.QP
+import java.awt.Color
+import qupath.lib.objects.classes.PathClass
+
+// Set the path to your CSV file
+String csvPath = "D:/桌面/fsdownload/processed_data.csv"
+
+// Read the CSV file
+def file = new File(csvPath)
+def lines = file.readLines()
+
+// Skip the header line
+lines = lines.drop(1)
+
+// Process each line
+lines.each { line ->
+    def tokens = line.split(",")
+    
+    // Extract x, y, width, height, and value
+    double x = Double.parseDouble(tokens[0])
+    double y = Double.parseDouble(tokens[1])
+    double width = Double.parseDouble(tokens[2])
+    double height = Double.parseDouble(tokens[3])
+    double value = Double.parseDouble(tokens[4])
+
+    // Create a rectangle ROI
+    def roi = new RectangleROI(x, y, width, height)
+
+    // Create an annotation
+    def annotation = new PathAnnotationObject(roi)
+
+    // Calculate color based on value
+    Color color
+    if (value <= 0.5) {
+        // Transition from blue to green to yellow
+        int red = (int)(510 * value)
+        int green = (int)(510 * Math.min(value, 0.5))
+        int blue = 255 - red
+        color = new Color(red, green, blue)
+    } else {
+        // Transition from yellow to red
+        int red = 255
+        int green = 255 - (int)(510 * (value - 0.5))
+        color = new Color(red, green, 0)
+    }
+
+    // Create or get the class with the specified color
+    def aClass = PathClass.fromString(value.toString(), color.getRGB())
+    annotation.setPathClass(aClass)
+
+    // Add the annotation to the image
+    QP.addObjects(annotation)
+}
+
+// Fire an update to refresh the display
+QP.fireHierarchyUpdate()
 ```
