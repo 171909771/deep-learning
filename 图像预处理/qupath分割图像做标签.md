@@ -13,6 +13,7 @@ def name = GeneralTools.getNameWithoutExtension(imageData.getServer().getMetadat
 def pathOutput = buildFilePath(PROJECT_BASE_DIR, 'tiles', name)
 mkdirs(pathOutput)
 
+// 下面2行得到的downsample 是每个像素点对应的resolution， 如果downsample 直接等于1（代表原始像素采集，例如本例就是512），等于2（代表原始像素扩大2倍采集，本例为1024）
 // Define output resolution
 double requestedPixelSize = 1  // Maintain original resolution
 
