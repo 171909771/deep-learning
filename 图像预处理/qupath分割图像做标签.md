@@ -13,12 +13,11 @@ def name = GeneralTools.getNameWithoutExtension(imageData.getServer().getMetadat
 def pathOutput = buildFilePath(PROJECT_BASE_DIR, 'tiles', name)
 mkdirs(pathOutput)
 
-// 下面2行得到的downsample 是每个像素点对应的resolution， 如果downsample 直接等于1（代表原始像素采集，例如本例就是512），等于2（代表原始像素扩大2倍采集，本例为1024）
-// Define output resolution
-double requestedPixelSize = 1  // Maintain original resolution
 
-// Convert to downsample
-double downsample = requestedPixelSize / imageData.getServer().getPixelCalibration().getAveragedPixelSize()
+
+
+
+double downsample = 1
 
 // Create an ImageServer for annotation-derived pixels
 def labelServer = new LabeledImageServer.Builder(imageData)
@@ -31,18 +30,18 @@ def labelServer = new LabeledImageServer.Builder(imageData)
 // Create and configure an exporter
 new TileExporter(imageData)
     .downsample(downsample)
-    .imageExtension('.png')
-    .tileSize(300)
+    .imageExtension('.jpg')
+    .tileSize(512)
     .labeledServer(labelServer)
     .annotatedTilesOnly(false)
-    .overlap(64)
+    .overlap(0)
     .writeTiles(pathOutput)
 
 // Renaming files in the output directory
 def dirOutput = new File(pathOutput)
 dirOutput.listFiles().each { file ->
-    if (file.isFile() && !file.isHidden() && file.getName().endsWith('.png')) {
-        def newName = file.getName().replaceAll("=", "-").replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(",", "_")
+    if (file.isFile() && !file.isHidden() && file.getName()) {
+        def newName = file.getName().replaceAll("=", "_").replaceAll(" ", "_").replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(",", "_")
         if (file.getName() != newName) {
             def fileUpdated = new File(file.getParent(), newName)
             println("Renaming ${file.getName()} ---> ${fileUpdated.getName()}")
