@@ -13,11 +13,13 @@ def name = GeneralTools.getNameWithoutExtension(imageData.getServer().getMetadat
 def pathOutput = buildFilePath(PROJECT_BASE_DIR, 'tiles', name)
 mkdirs(pathOutput)
 
+// 以下两步得到的downsample是每个pixel对应的实际大小，如果用（double downsample = 1， 表明是下采样，本例为512，double downsample = 1，本例为1024）
+// Define output resolution in calibrated units (e.g. µm if available)
+double requestedPixelSize = 5.0  // Define export resolution
 
-
-
-
-double downsample = 1
+// Convert output resolution to a downsample factor
+double pixelSize = imageData.getServer().getPixelCalibration().getAveragedPixelSize()
+double downsample = requestedPixelSize / pixelSize    // Define export resolution
 
 // Create an ImageServer for annotation-derived pixels
 def labelServer = new LabeledImageServer.Builder(imageData)
