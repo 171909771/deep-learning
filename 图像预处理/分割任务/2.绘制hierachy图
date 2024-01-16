@@ -95,3 +95,49 @@ if (viewer != null) {
 }
 
 ```
+
+### step2.2 单个不规则图形绘制 (尝试已废除)
+```
+import qupath.lib.roi.interfaces.ROI
+import qupath.lib.regions.ImagePlane
+import qupath.lib.objects.PathObject
+import qupath.lib.objects.PathObjects
+import qupath.lib.geom.Point2
+import qupath.lib.roi.ROIs
+import qupath.lib.gui.QuPathGUI
+import qupath.lib.gui.viewer.QuPathViewer
+
+// Define the coordinates of your irregular polygon
+double[][] points = [
+    [1029, 909],
+    [981, 926],
+    [1056, 947],
+    [1070, 916],
+    [1029, 909]
+]
+
+// Create a list to store the points using QuPath's Point2 class
+List<Point2> pointList = new ArrayList<>()
+points.each { coords ->
+    pointList.add(new Point2(coords[0], coords[1]))
+}
+
+// Assuming you're working with the current image
+ImagePlane plane = ImagePlane.getDefaultPlane()
+
+// Create the PolygonROI
+ROI roi = ROIs.createPolygonROI(pointList, plane)
+
+// Add the ROI to the current image
+PathObject pathObject = PathObjects.createDetectionObject(roi)
+
+// Get the current viewer
+QuPathViewer viewer = QuPathGUI.getInstance().getViewer()
+
+// Add the PathObject to the image
+if (viewer != null && viewer.getImageData() != null) {
+    viewer.getImageData().getHierarchy().addPathObject(pathObject)
+    viewer.repaint()
+}
+
+```
