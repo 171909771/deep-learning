@@ -1,0 +1,97 @@
+### step1 python中运行，.geojson to .csv file
+```
+import json
+import csv
+
+# Path to the GeoJSON file
+geojson_file_path = '/home/chan87/jupyter_home/Untitled.ome1.geojson'
+# Output CSV file path
+csv_file_path = '/home/chan87/jupyter_home/Untitled.ome1.csv'
+
+# Function to convert GeoJSON to CSV
+def convert_geojson_to_csv(geojson_path, csv_path):
+    with open(geojson_path, 'r') as file:
+        data = json.load(file)
+
+    with open(csv_path, 'w', newline='') as csvfile:
+        csvwriter = csv.writer(csvfile)
+
+        for feature in data['features']:
+            if feature['geometry']['type'] == 'Polygon':
+                # Extract the coordinates
+                coordinates = feature['geometry']['coordinates'][0]
+                # Convert coordinates to a semicolon-separated string
+                coord_string = ';'.join([f"{x},{y}" for x, y in coordinates])
+                # Write to CSV
+                csvwriter.writerow([coord_string])
+
+# Convert the file
+convert_geojson_to_csv(geojson_file_path, csv_file_path)
+```
+
+
+### step2 Qupath script中运行
+```
+import qupath.lib.regions.ImagePlane
+import qupath.lib.objects.PathObject
+import qupath.lib.objects.PathObjects
+import qupath.lib.geom.Point2
+import qupath.lib.roi.interfaces.ROI
+import qupath.lib.roi.ROIs
+import qupath.lib.gui.QuPathGUI
+import qupath.lib.gui.viewer.QuPathViewer
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.util.stream.Collectors
+
+// Function to read coordinates from a CSV file
+def readCoordinates(String filePath) {
+    def file = Paths.get(filePath)
+    def polygons = []
+    Files.lines(file).each { line ->
+        def points = line.split(";").collect { point ->
+            def coords = point.split(",").collect { it.replaceAll("\"", "").trim() } // Remove quotes and trim spaces
+            new Point2(Double.parseDouble(coords[0]), Double.parseDouble(coords[1]))
+        }
+        polygons.add(points)
+    }
+    return polygons
+}
+
+// Function to create and add a polygon ROI from coordinates
+def addPolygonROI(List<Point2> pointList, ImagePlane plane, QuPathViewer viewer) {
+    // Create the PolygonROI
+    ROI roi = ROIs.createPolygonROI(pointList, plane)
+
+    // Add the ROI to the current image
+    PathObject pathObject = PathObjects.createDetectionObject(roi)
+
+    // Add the PathObject to the image hierarchy if the viewer is valid
+    if (viewer != null && viewer.getImageData() != null) {
+        viewer.getImageData().getHierarchy().addPathObject(pathObject)
+    }
+}
+
+// Path to your coordinates CSV file，改路径
+String coordinatesFilePath = "D:/桌面/fsdownload/Untitled.ome1.csv"
+
+// Read the coordinates
+def polygons = readCoordinates(coordinatesFilePath)
+
+// Assuming you're working with the current image
+ImagePlane plane = ImagePlane.getDefaultPlane()
+
+// Get the current viewer
+QuPathViewer viewer = QuPathGUI.getInstance().getViewer()
+
+// Add each polygon ROI
+polygons.each { points ->
+    addPolygonROI(points, plane, viewer)
+}
+
+// Repaint the viewer to update the display
+if (viewer != null) {
+    viewer.repaint()
+}
+
+```
