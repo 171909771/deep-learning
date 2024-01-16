@@ -14,29 +14,41 @@ def pathOutput = buildFilePath(PROJECT_BASE_DIR, 'tiles', name)
 mkdirs(pathOutput)
 
 // Define output resolution
-double requestedPixelSize = 1  // 分辨率设置为1，保持原图不变（自己领悟）
+double requestedPixelSize = 1  // Maintain original resolution
 
 // Convert to downsample
 double downsample = requestedPixelSize / imageData.getServer().getPixelCalibration().getAveragedPixelSize()
 
-// Create an ImageServer where the pixels are derived from annotations
+// Create an ImageServer for annotation-derived pixels
 def labelServer = new LabeledImageServer.Builder(imageData)
-    .backgroundLabel(0, ColorTools.WHITE) // Specify background label (usually 0 or 255)
-    .downsample(downsample)    // Choose server resolution; this should match the resolution at which tiles are exported
-    .addLabel('Tumor', 1)      // Choose output labels (the order matters!)
-
-    .multichannelOutput(false)  // If true, each label is a different channel (required for multiclass probability) 这里一定要是false才能使单通道作为标签
+    .backgroundLabel(0, ColorTools.WHITE)
+    .downsample(downsample)
+    .addLabel('Tumor', 1)
+    .multichannelOutput(false)
     .build()
 
-// Create an exporter that requests corresponding tiles from the original & labeled image servers
+// Create and configure an exporter
 new TileExporter(imageData)
-    .downsample(downsample)     // Define export resolution
-    .imageExtension('.png')     // Define file extension for original pixels (often .tif, .jpg, '.png' or '.ome.tif')
-    .tileSize(300)              // Define size of each tile, in pixels
-    .labeledServer(labelServer) // Define the labeled image server to use (i.e. the one we just built)
-    .annotatedTilesOnly(false)  // If true, only export tiles if there is a (labeled) annotation present
-    .overlap(64)                // Define overlap, in pixel units at the export resolution
-    .writeTiles(pathOutput)     // Write tiles to the specified directory  名称似乎改不了
+    .downsample(downsample)
+    .imageExtension('.png')
+    .tileSize(300)
+    .labeledServer(labelServer)
+    .annotatedTilesOnly(false)
+    .overlap(64)
+    .writeTiles(pathOutput)
 
-print 'Done!'
+// Renaming files in the output directory
+def dirOutput = new File(pathOutput)
+dirOutput.listFiles().each { file ->
+    if (file.isFile() && !file.isHidden() && file.getName().endsWith('.png')) {
+        def newName = file.getName().replaceAll("=", "-").replaceAll("\\[", "").replaceAll("\\]", "").replaceAll(",", "_")
+        if (file.getName() != newName) {
+            def fileUpdated = new File(file.getParent(), newName)
+            println("Renaming ${file.getName()} ---> ${fileUpdated.getName()}")
+            file.renameTo(fileUpdated)
+        }
+    }
+}
+
+println('Done!')
 ```
