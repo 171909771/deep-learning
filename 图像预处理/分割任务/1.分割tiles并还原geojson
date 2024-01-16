@@ -1,0 +1,89 @@
+### step1 整合所有mask
+```
+import os
+from PIL import Image
+
+def parse_filename(filename):
+    """ Extract coordinates and size from filename """
+    parts = filename.split('_')
+    x = int(parts[2])
+    y = int(parts[4])
+    w = int(parts[6])
+    h = int(parts[8].split('.')[0])
+    return x, y, w, h
+
+def find_canvas_size(files):
+    """ Determine the size of the canvas based on the files """
+    max_width = 0
+    max_height = 0
+    for file in files:
+        x, y, w, h = parse_filename(file)
+        max_width = max(max_width, x + w)
+        max_height = max(max_height, y + h)
+    return max_width, max_height
+
+# Assuming all images are in the 'images' folder
+image_folder = '/home/chan87/jupyter_home/123'
+files = [f for f in os.listdir(image_folder) if f.endswith('.png')]
+
+canvas_width, canvas_height = find_canvas_size(files)
+canvas = Image.new('RGB', (canvas_width, canvas_height), 'white')
+
+for file in files:
+    img = Image.open(os.path.join(image_folder, file))
+    x, y, _, _ = parse_filename(file)
+    canvas.paste(img, (x, y))
+
+canvas.save('/home/chan87/jupyter_home/123/integrated_image.png')
+
+```
+
+
+
+### step2 生成geojson
+```
+import cv2
+import geojson
+from shapely.geometry import Polygon, mapping
+
+# Load the image
+image = cv2.imread('/home/chan87/jupyter_home/123/integrated_image.png', cv2.IMREAD_GRAYSCALE)
+
+# Thresholding to get the binary image
+_, binary = cv2.threshold(image, 128, 255, cv2.THRESH_BINARY_INV)
+
+# Find contours
+contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)  # CHAIN_APPROX_NONE for more detail
+
+# Offset coordinates
+x_offset = 0
+y_offset = 0
+
+# Check if any contours were found
+if contours:
+    # Initialize a list for GeoJSON features
+    features = []
+
+    for contour in contours:
+        # Extract and offset coordinates
+        coords = [(point[0][0] + x_offset, point[0][1] + y_offset) for point in contour]
+
+        # Create a Shapely polygon and check if it's valid
+        polygon = Polygon(coords)
+        if polygon.is_valid:
+            # Convert to GeoJSON feature
+            feature = geojson.Feature(geometry=mapping(polygon), properties={})
+            features.append(feature)
+
+    # Create a FeatureCollection
+    feature_collection = geojson.FeatureCollection(features)
+
+    # Write to a file
+    with open('/home/chan87/jupyter_home/123/output.geojson', 'w') as f:
+        geojson.dump(feature_collection, f)
+
+    print("GeoJSON file created successfully.")
+else:
+    print("No contours found in the image.")
+
+```
