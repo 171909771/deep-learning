@@ -43,7 +43,7 @@ def dirOutput = new File(pathOutput)
 for (def file in dirOutput.listFiles()) {
     if (!file.isFile() || file.isHidden() || !file.getName().endsWith(extension))
         continue
-    def newName = file.getName().replaceAll("=","-").replaceAll("\\[","").replaceAll("\\]","").replaceAll(",","_")
+    def newName = file.getName().replaceAll("=","-").replaceAll("\\[","").replaceAll("\\]","").replaceAll(",","_").replaceAll(" ","_")
     if (file.getName() == newName)
         continue
     def fileUpdated = new File(file.getParent(), newName)
