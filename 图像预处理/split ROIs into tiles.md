@@ -12,8 +12,16 @@ GeneralTools.getNameWithoutExtension(imageData.getServer().getMetadata().getName
 def pathOutput = buildFilePath(PROJECT_BASE_DIR, 'tiles', name)
 mkdirs(pathOutput)
 
-// To export at full resolution
-double downsample = 1
+// Method.1. To export at full resolution
+double downsample = 1              # 1 represents full resolution, the number is bigger the resolution is lower
+// Method.1. To export at full resolution
+
+// Method.2. To export at a fix resolution
+// Define output resolution in calibrated units (e.g. µm if available)
+double requestedPixelSize = 1  // Define export resolution; find the specific resolution value in the image item in Qupath
+double pixelSize = imageData.getServer().getPixelCalibration().getAveragedPixelSize()
+double downsample = requestedPixelSize / pixelSize    // Define export resolution  这里可以统一所有图像的分辨率, step 2
+// Method.2. To export at a fix resolution
 
 // Create an exporter that requests corresponding tiles from the original & labeled image servers
 new TileExporter(imageData)
