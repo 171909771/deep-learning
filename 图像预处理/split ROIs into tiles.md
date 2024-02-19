@@ -1,3 +1,9 @@
+## Identify if the ROIs are considered as the targeted area. "ture" represents yes
+.annotatedTilesOnly(true)
+
+## The resolution of the output picture depends on the method you choose
+- only choose one method Method.1 or Method.2
+
 ```
 /**
  * Script to export image tiles (can be customized in various ways).
