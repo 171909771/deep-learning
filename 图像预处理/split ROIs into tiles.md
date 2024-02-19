@@ -19,7 +19,8 @@ def pathOutput = buildFilePath(PROJECT_BASE_DIR, 'tiles', name)
 mkdirs(pathOutput)
 
 // Method.1. To export at full resolution
-double downsample = 1              # 1 represents full resolution, the number is bigger the resolution is lower
+// 1 represents full resolution, the number is bigger the resolution is lower
+double downsample = 1              
 // Method.1. To export at full resolution
 
 // Method.2. To export at a fix resolution
