@@ -31,6 +31,8 @@ double downsample = requestedPixelSize / pixelSize    // Define export resolutio
 // Method.2. To export at a fix resolution
 
 // Create an exporter that requests corresponding tiles from the original & labeled image servers
+// If there are fluorescence images with multiple channels, and wanna choose a specific channel, could add ".channels(int)" parameter in the TileExporter functions
+// and the output picture type should be .tif
 new TileExporter(imageData)
     .downsample(downsample)   // Define export resolution
     .imageExtension(extension)   // Define file extension for original pixels (often .tif, .jpg, '.png' or '.ome.tif')
