@@ -20,6 +20,7 @@ addObjects(detections)
 ```
 
 ## 2.2 annotation to detection based on the classification
+- https://forum.image.sc/t/convert-annotations-into-detections-in-qupath/92287/3
 ```
 // Convert annotations to detections
 def annotations = getAnnotationObjects().findAll{it.getPathClass() == getPathClass("Annotation Class")}
