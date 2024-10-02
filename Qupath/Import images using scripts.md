@@ -4,14 +4,22 @@
 ### 1. importing single file
 ```
 import qupath.lib.images.servers.ImageServers
+import java.nio.file.Paths
+
 def imagePath = "/home/chan87/Desktop/WSI/metastasis/metastasis/2400529/2400529_5.svs"
 def project = getProject()
 if (project == null) {
     println "A project must be opened before running this script"
     return
 }
+
+// Extract the filename from the imagePath to use as the image name
+def imageName = Paths.get(imagePath).getFileName().toString()
 def imageServer = ImageServers.buildServer(imagePath)
 def imageEntry = project.addImage(imageServer.getBuilder())
+imageEntry.setImageName(imageName)
+
+project.syncChanges()
 getQuPath().refreshProject()
 ```
 
@@ -22,6 +30,7 @@ import java.nio.file.Files
 import java.nio.file.Paths
 
 def dirPath = "/home/chan87/Desktop/WSI/metastasis/metastasis/2400529"
+
 def project = getProject()
 if (project == null) {
     println "A project must be opened before running this script"
@@ -31,11 +40,18 @@ if (project == null) {
 // List all files in the directory
 Files.newDirectoryStream(Paths.get(dirPath), "*.svs").each { path ->
     try {
+        // Extract the filename to use as the image name
+        def imageName = path.getFileName().toString()
+        
         // Build server for each .svs file
         def imageServer = ImageServers.buildServer(path.toString())
         if (imageServer != null) {
-            // Add the image to the project
-            project.addImage(imageServer.getBuilder())
+            // Create an image entry and set the image name
+            def imageEntry = project.addImage(imageServer.getBuilder())
+            imageEntry.setImageName(imageName)  // Set the image name to the original filename
+            
+            // Save changes for each entry added
+            project.save()
         } else {
             println "Failed to build server for: ${path}"
         }
@@ -71,11 +87,18 @@ try {
     Files.walk(Paths.get(dirPath)).forEach { path ->
         if (path.toString().toLowerCase().endsWith(".svs")) {
             try {
+                // Extract the filename to use as the image name
+                def imageName = path.getFileName().toString()
+                
                 // Build server for each .svs file
                 def imageServer = ImageServers.buildServer(path.toString())
                 if (imageServer != null) {
-                    // Add the image to the project
-                    project.addImage(imageServer.getBuilder())
+                    // Create an image entry and set the image name
+                    def imageEntry = project.addImage(imageServer.getBuilder())
+                    imageEntry.setImageName(imageName)  // Set the image name to the original filename
+                    
+                    // Save changes for each entry added
+                    project.save()
                 } else {
                     println "Failed to build server for: ${path}"
                 }
@@ -92,5 +115,6 @@ try {
 getQuPath().refreshProject()
 
 println "All .svs files from the directory and its subdirectories have been added."
+
 
 ```
