@@ -118,3 +118,68 @@ println "All .svs files from the directory and its subdirectories have been adde
 
 
 ```
+
+### 3. Randomly importing one files in all subdirectories in a specific directory
+```
+import qupath.lib.images.servers.ImageServers
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.Path
+import java.io.IOException
+import java.util.stream.Collectors
+import java.util.Random
+
+def dirPath = "/home/chan87/Desktop/WSI/metastasis"
+
+def project = getProject()
+if (project == null) {
+    println "A project must be opened before running this script"
+    return
+}
+
+Random random = new Random()
+
+try {
+    // Create a map to store subdirectories and their respective files
+    Map<String, List<Path>> directoryFiles = new HashMap<>()
+
+    // Walk through all files in the directory and subdirectories
+    Files.walk(Paths.get(dirPath)).forEach { path ->
+        if (path.toString().toLowerCase().endsWith(".svs")) {
+            String parentDir = path.getParent().toString()
+            if (!directoryFiles.containsKey(parentDir)) {
+                directoryFiles.put(parentDir, new ArrayList<>())
+            }
+            directoryFiles.get(parentDir).add(path)
+        }
+    }
+
+    // Process one random file from each subdirectory
+    directoryFiles.each { dir, paths ->
+        if (!paths.isEmpty()) {
+            Path path = paths.get(random.nextInt(paths.size()))
+            try {
+                def imageName = path.getFileName().toString()
+                def imageServer = ImageServers.buildServer(path.toString())
+                if (imageServer != null) {
+                    def imageEntry = project.addImage(imageServer.getBuilder())
+                    imageEntry.setImageName(imageName)
+                    project.save()
+                } else {
+                    println "Failed to build server for: ${path}"
+                }
+            } catch (Exception e) {
+                println "Error processing file ${path}: ${e.getMessage()}"
+            }
+        }
+    }
+} catch (IOException e) {
+    println "Error walking through the directory: ${e.getMessage()}"
+}
+
+// Refresh the project view to show new images
+getQuPath().refreshProject()
+
+println "One random .svs file from each subdirectory has been added."
+
+```
