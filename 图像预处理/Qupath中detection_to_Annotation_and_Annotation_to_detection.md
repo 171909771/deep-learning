@@ -1,4 +1,4 @@
-## 1转换detection in Hierachy 为 annotation
+## 1.1 转换detection in Hierachy 为 annotation
 - https://forum.image.sc/t/convert-detections-to-annotations-in-qupath/50627
 ```
 def detections = getDetectionObjects()
@@ -6,6 +6,28 @@ def newAnnotations = detections.collect {
     return PathObjects.createAnnotationObject(it.getROI(), it.getPathClass())
 }
 removeObjects(detections, true)
+addObjects(newAnnotations)
+```
+## 1.2 specific detection to annotation
+```
+// Define the specific PathClass to filter
+String targetPathClassName = "predictor+"
+
+// Get all detection objects
+def detections = getDetectionObjects()
+
+// Filter detections to only include those with the specified PathClass
+def filteredDetections = detections.findAll { it.getPathClass() != null && it.getPathClass().getName() == targetPathClassName }
+
+// Convert the filtered detections to annotations
+def newAnnotations = filteredDetections.collect {
+    return PathObjects.createAnnotationObject(it.getROI(), it.getPathClass())
+}
+
+// Remove the filtered detection objects
+removeObjects(filteredDetections, true)
+
+// Add the new annotations to the project
 addObjects(newAnnotations)
 ```
 
